@@ -3,39 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ManhwaVerse - Read Premium Manhwa</title>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>ManhwaComics - Read Premium Manhwa</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- GSAP & Lenis -->
+    <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Lenis Smooth Scroll -->
     <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+    
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        primary: '#6C5CE7',
-                        secondary: '#FF6B6B',
-                        dark: '#0F0F0F',
-                        darker: '#0A0A0A',
-                        surface: '#1A1A1A',
-                        surfaceLight: '#252525'
-                    },
                     fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
-                        display: ['Space Grotesk', 'sans-serif']
+                        'outfit': ['Outfit', 'sans-serif'],
+                        'space': ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        'neon-pink': '#FF006E',
+                        'neon-purple': '#8338EC',
+                        'neon-blue': '#3A86FF',
+                        'neon-cyan': '#00F5FF',
+                        'dark-bg': '#0A0A0F',
+                        'card-bg': '#15151E',
+                        'accent-gold': '#FFD700',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+                        'gradient-x': 'gradient-x 15s ease infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        'pulse-glow': {
+                            '0%, 100%': { boxShadow: '0 0 20px rgba(255, 0, 110, 0.5)' },
+                            '50%': { boxShadow: '0 0 40px rgba(255, 0, 110, 0.8)' },
+                        },
+                        'gradient-x': {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
+                        }
                     }
                 }
             }
@@ -48,921 +73,1422 @@
             padding: 0;
             box-sizing: border-box;
         }
-
-        html {
-            scroll-behavior: auto;
-        }
-
-        body {
-            font-family: 'Outfit', sans-serif;
-            background-color: #0F0F0F;
-            color: #ffffff;
-            overflow-x: hidden;
-        }
-
-        /* Lenis Smooth Scroll */
+        
         html.lenis, html.lenis body {
             height: auto;
         }
-
+        
         .lenis.lenis-smooth {
             scroll-behavior: auto !important;
         }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
+        
+        .lenis.lenis-smooth [data-lenis-prevent] {
+            overscroll-behavior: contain;
         }
-
-        ::-webkit-scrollbar-track {
-            background: #0A0A0A;
+        
+        .lenis.lenis-stopped {
+            overflow: hidden;
         }
-
-        ::-webkit-scrollbar-thumb {
-            background: #6C5CE7;
-            border-radius: 4px;
+        
+        .glass-morphism {
+            background: rgba(21, 21, 30, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #7C6CF7;
-        }
-
-        /* Gradient Text */
+        
         .gradient-text {
-            background: linear-gradient(135deg, #6C5CE7 0%, #FF6B6B 100%);
+            background: linear-gradient(135deg, #FF006E 0%, #8338EC 50%, #3A86FF 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
-        /* Glass Effect */
-        .glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        
+        .gradient-border {
+            position: relative;
+            background: linear-gradient(135deg, #15151E 0%, #0A0A0F 100%);
         }
-
-        /* Card Hover Effect */
-        .manhwa-card {
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64), box-shadow 0.4s ease;
+        
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            padding: 2px;
+            background: linear-gradient(135deg, #FF006E, #8338EC, #3A86FF);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            border-radius: inherit;
+            pointer-events: none;
         }
-
-        .manhwa-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(108, 92, 231, 0.3);
+        
+        .manga-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        /* Reading Progress */
-        .reading-progress {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 0%;
-            height: 3px;
-            background: linear-gradient(90deg, #6C5CE7, #FF6B6B);
-            z-index: 9999;
+        
+        .manga-card:hover {
+            transform: translateY(-10px) scale(1.02);
         }
-
-        /* Bookmark Animation */
-        .bookmark-btn {
-            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        
+        .manga-card:hover .card-overlay {
+            opacity: 1;
         }
-
-        .bookmark-btn.active {
-            color: #FF6B6B;
+        
+        .manga-card:hover .card-image {
             transform: scale(1.1);
         }
-
-        /* Navigation */
+        
+        .card-image {
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-overlay {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
         .nav-link {
             position: relative;
             overflow: hidden;
         }
-
+        
         .nav-link::after {
             content: '';
             position: absolute;
             bottom: 0;
             left: 0;
-            transform: translateX(-100%);
             width: 100%;
             height: 2px;
-            background: #6C5CE7;
+            background: linear-gradient(90deg, #FF006E, #8338EC);
+            transform: translateX(-100%);
             transition: transform 0.3s ease;
         }
-
+        
         .nav-link:hover::after {
             transform: translateX(0);
         }
-
-        /* Hero Gradient */
-        .hero-gradient {
-            background: radial-gradient(ellipse at top, #1A1A1A, transparent),
-                        radial-gradient(ellipse at bottom right, #6C5CE720, transparent),
-                        radial-gradient(ellipse at bottom left, #FF6B6B15, transparent);
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
-
-        /* Loading Screen */
-        .loader {
-            position: fixed;
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0A0A0F;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #FF006E, #8338EC);
+            border-radius: 3px;
+        }
+        
+        .hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            perspective: 1000px;
+        }
+        
+        .carousel-3d {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+        
+        .carousel-card {
+            position: absolute;
+            width: 280px;
+            height: 420px;
+            left: 50%;
+            top: 50%;
+            margin-left: -140px;
+            margin-top: -210px;
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+        
+        .carousel-card::before {
+            content: '';
+            position: absolute;
             inset: 0;
-            background: #0F0F0F;
-            z-index: 10000;
+            padding: 2px;
+            background: linear-gradient(135deg, #FF006E, #8338EC, #3A86FF);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            border-radius: inherit;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .carousel-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .carousel-card .card-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+        
+        .carousel-card:hover .card-info {
+            transform: translateY(0);
+        }
+        
+        .carousel-card.active .card-info {
+            transform: translateY(0);
+        }
+        
+        .carousel-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+        
+        .carousel-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .carousel-dot.active {
+            background: #FF006E;
+            transform: scale(1.3);
+            box-shadow: 0 0 20px rgba(255, 0, 110, 0.8);
+        }
+        
+        .carousel-dot:hover {
+            background: rgba(255, 0, 110, 0.6);
+        }
+        
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(21, 21, 30, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
-            gap: 2rem;
+            transition: all 0.3s ease;
+            z-index: 100;
         }
-
-        .loader-text {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 2rem;
-            font-weight: 700;
-            letter-spacing: 0.5em;
+        
+        .carousel-arrow:hover {
+            background: rgba(255, 0, 110, 0.3);
+            border-color: #FF006E;
+            transform: translateY(-50%) scale(1.1);
         }
-
-        /* Image Reveal */
-        .reveal-image {
-            clip-path: inset(0 100% 0 0);
+        
+        .carousel-arrow.prev { left: 20px; }
+        .carousel-arrow.next { right: 20px; }
+        
+        @media (max-width: 768px) {
+            .carousel-container {
+                height: 450px;
+            }
+            .carousel-card {
+                width: 220px;
+                height: 330px;
+                margin-left: -110px;
+                margin-top: -165px;
+            }
+            .carousel-arrow {
+                width: 40px;
+                height: 40px;
+            }
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .tag-pop {
+            animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        @keyframes pop {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .login-modal {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .login-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .login-content {
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .login-modal.active .login-content {
+            transform: scale(1) translateY(0);
+        }
+        
+        .bookmark-btn.active {
+            color: #FF006E;
+            animation: heartBeat 0.3s ease;
+        }
+        
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+        
+        .genre-pill {
+            transition: all 0.3s ease;
+        }
+        
+        .genre-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 0, 110, 0.3);
+        }
+        
+        .genre-pill.active {
+            background: linear-gradient(135deg, #FF006E, #8338EC);
+            color: white;
+        }
+        
+        .reading-progress {
+            background: linear-gradient(90deg, #FF006E, #8338EC);
+        }
+        
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        .reflection {
+            position: absolute;
+            bottom: -30px;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.1), transparent);
+            transform: scaleY(-1);
+            opacity: 0.3;
+            filter: blur(2px);
+            pointer-events: none;
         }
     </style>
 </head>
-<body>
-    <!-- Reading Progress Bar -->
-    <div class="reading-progress" id="readingProgress"></div>
-
-    <!-- Loader -->
-    <div class="loader" id="loader">
-        <h1 class="loader-text gradient-text">MANHWAVERSE</h1>
-        <div class="w-48 h-1 bg-surfaceLight rounded-full overflow-hidden">
-            <div class="h-full bg-primary w-0" id="loaderBar"></div>
-        </div>
-    </div>
-
-    <!-- Header -->
-    <header class="fixed top-0 left-0 w-full z-50 transition-all duration-500" id="mainHeader">
-        <div class="glass border-b border-white/10">
-            <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-                <!-- Logo -->
-                <a href="#" class="flex items-center gap-3 group" id="logo">
-                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-300">
-                        <i data-lucide="book-open" class="w-6 h-6 text-white"></i>
-                    </div>
-                    <span class="font-display text-2xl font-bold tracking-tight">MANHWA<span class="text-primary">VERSE</span></span>
+<body class="bg-dark-bg text-white font-outfit overflow-x-hidden custom-scrollbar">
+    
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 left-0 w-full z-50 transition-all duration-500 py-4 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-2 cursor-pointer group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-pink to-neon-purple flex items-center justify-center transform group-hover:rotate-12 transition-transform">
+                    <i data-lucide="book-open" class="w-5 h-5 text-white"></i>
+                </div>
+                <span class="text-2xl font-bold font-space tracking-tight">
+                    Manhwa<span class="text-neon-pink">Comics</span>
+                </span>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#home" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Home</a>
+                <a href="#trending" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Trending</a>
+                <a href="#latest" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Latest</a>
+                <a href="#genres" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Genres</a>
+                <a href="#bookmarks" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors flex items-center gap-1">
+                    <i data-lucide="bookmark" class="w-4 h-4"></i>
+                    Bookmarks
                 </a>
-                <div class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></div>
-                </a>
-
-                <!-- Navigation -->
-                <nav class="hidden md:flex items-center gap-8">
-                    <a href="#popular" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Popular</a>
-                    <a href="#latest" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Latest</a>
-                    <a href="#genres" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Genres</a>
-                    <a href="#completed" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">Completed</a>
-                <a href="#bookmarks" class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors">My List</a>
-                </nav>
-
-                <!-- Bookmark Button -->
-                <button id="bookmarkBtn" class="bookmark-btn flex items-center gap-2 px-5 py-2.5 rounded-full glass hover:bg-white/10 transition-all">
-                    <i data-lucide="bookmark" class="w-5 h-5"></i>
-                    <span class="text-sm font-medium">Bookmarks</span>
-                    <span id="bookmarkCount" class="bg-primary text-white text-xs font-bold px-2 py-0.5 rounded-full hidden">0</span>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <button id="searchBtn" class="p-2 rounded-full hover:bg-white/10 transition-colors">
+                    <i data-lucide="search" class="w-5 h-5 text-gray-300"></i>
+                </button>
+                
+                <button id="loginBtn" class="hidden sm:flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-neon-pink to-neon-purple text-white font-medium text-sm hover:shadow-lg hover:shadow-neon-pink/30 transition-all transform hover:scale-105">
+                    <i data-lucide="user" class="w-4 h-4"></i>
+                    Login
+                </button>
+                
+                <button id="mobileMenuBtn" class="md:hidden p-2 rounded-full hover:bg-white/10 transition-colors">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
                 </button>
             </div>
         </div>
-    </header>
-
-    <!-- Mobile Menu Button -->
-    <button id="mobileMenuBtn" class="md:hidden fixed top-4 right-6 z-50 w-12 h-12 flex items-center justify-center rounded-full glass">
-        <i data-lucide="menu" class="w-6 h-6"></i>
-    </button>
+    </nav>
 
     <!-- Mobile Menu -->
-    <div id="mobileMenu" class="fixed inset-0 z-40 bg-darker transform translate-x-full transition-transform duration-500 md:hidden">
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="mobileMenuOverlay"></div>
-        <div class="absolute right-0 top-0 h-full w-80 bg-surface border-l border-white/10 p-8 transform translate-x-full transition-transform duration-500" id="mobileMenuContent">
-            <button id="closeMobileMenu" class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center">
-                <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
-            <div class="mt-16 flex flex-col gap-6">
-                <a href="#popular" class="text-lg font-medium text-gray-300 hover:text-white transition-colors">Popular</a>
-                <a href="#latest" class="text-lg font-medium text-gray-300 hover:text-white transition-colors">Latest</a>
-                <a href="#genres" class="text-lg font-medium text-gray-300 hover:text-white transition-colors">Genres</a>
-                <a href="#completed" class="text-lg font-medium text-gray-300 hover:text-white transition-colors">Completed</a>
-                <a href="#bookmarks" class="text-lg font-medium text-gray-300 hover:text-white transition-colors">My Bookmarks</a>
+    <div id="mobileMenu" class="fixed inset-0 z-40 bg-dark-bg/95 backdrop-blur-xl transform translate-x-full transition-transform duration-300 md:hidden">
+        <div class="p-6">
+            <div class="flex justify-end mb-8">
+                <button id="closeMobileMenu" class="p-2 rounded-full hover:bg-white/10">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div class="flex flex-col gap-6">
+                <a href="#home" class="text-2xl font-bold text-white">Home</a>
+                <a href="#trending" class="text-2xl font-bold text-gray-400 hover:text-white">Trending</a>
+                <a href="#latest" class="text-2xl font-bold text-gray-400 hover:text-white">Latest</a>
+                <a href="#genres" class="text-2xl font-bold text-gray-400 hover:text-white">Genres</a>
+                <a href="#bookmarks" class="text-2xl font-bold text-gray-400 hover:text-white">Bookmarks</a>
+                <button class="mt-4 w-full py-3 rounded-full bg-gradient-to-r from-neon-pink to-neon-purple text-white font-bold">
+                    Login
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center justify-center pt-20 hero-gradient overflow-hidden">
-        <div class="absolute inset-0 opacity-30">
-            <div class="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
-            <div class="absolute bottom-20 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        </div class="absolute top-40 right-1/4 w-64 h-64 bg-primary/10 rounded-full blur-2xl"></div>
-        </div>
+    <!-- Hero Section with Three.js Background -->
+    <section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+        <canvas id="heroCanvas" class="hero-canvas"></canvas>
         
-        <div class="max-w-7xl mx-auto px-6 py-20 relative z-10">
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
-                <div class="hero-content">
-                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-6">
-                        <span class="text-sm font-medium text-primary">✨ New Chapter Every Day</span>
+                <div class="space-y-8">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-morphism text-sm font-medium text-neon-pink animate-pulse-glow">
+                        <span class="w-2 h-2 rounded-full bg-neon-pink animate-pulse"></span>
+                        New Chapter Updates Daily
                     </div>
-                    <i data-lucide="sparkles" class="w-4 h-4 text-primary"></i>
-                    </div>
-                    <h1 class="text-5xl md:text-7xl font-display font-bold leading-tight mb-6">
-                        Discover Your Next
-                        <span class="gradient-text">Favorite Manhwa</span>
+                    
+                    <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold font-space leading-tight">
+                        Read <span class="gradient-text italic">Premium</span><br>
+                        Manhwa in <span class="text-neon-cyan">HD</span>
                     </h1>
-                    <p class="text-lg text-gray-400 mb-8 max-w-lg leading-relaxed">
-                        Immerse yourself in stunning visuals and captivating stories. From action-packed adventures to heartwarming romances, find your perfect read today.
+                    
+                    <p class="text-lg text-gray-400 max-w-lg leading-relaxed">
+                        Immerse yourself in thousands of high-quality Korean comics. From romance to action, discover your next obsession with our curated collection.
                     </p>
+                    
                     <div class="flex flex-wrap gap-4">
-                        <button class="group relative px-8 py-4 bg-primary rounded-xl font-semibold text-white overflow-hidden transition-all hover:scale-105 hover:shadow-2xl hover:shadow-primary/50">
-                            <span class="relative z-10 flex items-center gap-2">
-                                Start Reading
-                                <i data-lucide="arrow-right" class="w-5 h-5 transform group-hover:translate-x-1 transition-transform"></i>
-                            </span>
-                            <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                        <button class="px-8 py-4 rounded-full bg-gradient-to-r from-neon-pink to-neon-purple text-white font-bold text-lg hover:shadow-2xl hover:shadow-neon-pink/40 transition-all transform hover:scale-105 flex items-center gap-2">
+                            <i data-lucide="play" class="w-5 h-5"></i>
+                            Start Reading
                         </button>
-                        <button class="px-8 py-4 border border-white/20 rounded-xl font-semibold text-white hover:bg-white/10 transition-all">
-                            Browse Library
+                        <button class="px-8 py-4 rounded-full glass-morphism text-white font-bold text-lg hover:bg-white/10 transition-all flex items-center gap-2">
+                            <i data-lucide="bookmark" class="w-5 h-5"></i>
+                            My Library
                         </button>
+                    </div>
+                    
+                    <div class="flex items-center gap-8 pt-4">
+                        <div>
+                            <div class="text-3xl font-bold text-white">10K+</div>
+                            <div class="text-sm text-gray-500">Titles</div>
+                        </div>
+                        <div class="w-px h-12 bg-gray-800"></div>
+                        <div>
+                            <div class="text-3xl font-bold text-white">1M+</div>
+                            <div class="text-sm text-gray-500">Readers</div>
+                        </div>
+                        <div class="w-px h-12 bg-gray-800"></div>
+                        <div>
+                            <div class="text-3xl font-bold text-white">Daily</div>
+                            <div class="text-sm text-gray-500">Updates</div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="mt-12 flex items-center gap-6 text-sm text-gray-400">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="users" class="w-5 h-5 text-primary"></i>
-                        <span>2M+ Readers</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="book-open" class="w-5 h-5 text-secondary"></i>
-                        <span>10K+ Chapters</span>
+                <!-- 3D Carousel Container -->
+                <div class="relative h-[600px] flex items-center justify-center">
+                    <!-- Glow Effect -->
+                    <div class="absolute inset-0 rounded-3xl bg-gradient-to-br from-neon-pink/20 to-neon-purple/20 blur-3xl"></div>
+                    
+                    <!-- 3D Carousel -->
+                    <div class="carousel-container" id="carouselContainer">
+                        <div class="carousel-3d" id="carousel3d">
+                            <!-- Cards injected by JS -->
+                        </div>
+                        
+                        <!-- Navigation Arrows -->
+                        <button class="carousel-arrow prev" id="prevBtn">
+                            <i data-lucide="chevron-left" class="w-6 h-6"></i>
+                        </button>
+                        <button class="carousel-arrow next" id="nextBtn">
+                            <i data-lucide="chevron-right" class="w-6 h-6"></i>
+                        </button>
+                        
+                        <!-- Dots -->
+                        <div class="carousel-nav" id="carouselNav"></div>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
-                        <i data-lucide="star" class="w-5 h-5 text-yellow-500"></i>
-                        <span>4.9 Rating</span>
-                    </div>
-                    </div>
-                </div>
-                </div>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2 opacity-50">
+            <span class="text-xs text-gray-400">Scroll to explore</span>
+            <div class="w-6 h-10 rounded-full border-2 border-gray-600 flex justify-center pt-2">
+                <div class="w-1 h-2 bg-white rounded-full animate-bounce"></div>
             </div>
         </div>
     </section>
 
-    <!-- Popular Section -->
-    <section id="popular" class="py-24 bg-darker">
-        <div class="max-w-7xl mx-auto px-6">
+    <!-- Trending Section -->
+    <section id="trending" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
             <div class="flex items-end justify-between mb-12">
                 <div>
-                    <h2 class="text-4xl font-display font-bold mb-4">Popular Now</h2>
-                    <p class="text-gray-400">Trending among readers this week</p>
+                    <h2 class="text-4xl sm:text-5xl font-bold font-space mb-4">
+                        Trending <span class="text-neon-pink">Now</span>
+                    </h2>
+                    <p class="text-gray-400">Most popular titles this week</p>
                 </div>
-                <div class="flex gap-4">
-                    <button class="px-4 py-2 rounded-lg glass text-sm font-medium hover:bg-white/10 transition-all">This Week</button>
-                    <button class="px-4 py-2 rounded-lg glass text-sm font-medium hover:bg-white/10 transition-all">This Month</button>
-                    <button class="px-4 py-2 bg-primary rounded-lg text-sm font-medium text-white hover:bg-primary/80 transition-all">All Time</button>
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="popularGrid">
-                <!-- Cards will be injected here by JS -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Latest Updates -->
-    <section id="latest" class="py-24">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="flex items-end justify-between mb-12">
-                <div>
-                    <h2 class="text-4xl font-display font-bold mb-4">Latest Updates</h2>
-                    <p class="text-gray-400">Fresh chapters released today</p>
-                </div>
-                <button class="px-6 py-3 border border-white/20 rounded-xl font-medium hover:bg-white/10 transition-all flex items-center gap-2">
-                    View All
-                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                <button class="hidden sm:flex items-center gap-2 text-neon-pink hover:text-white transition-colors font-medium">
+                    View All <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="latestGrid">
-                <!-- Latest cards injected here -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6" id="trendingGrid">
+                <!-- Cards will be injected by JS -->
             </div>
         </div>
     </section>
 
     <!-- Genres Section -->
-    <section id="genres" class="py-24 bg-darker relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent"></div>
-        
-        <div class="max-w-7xl mx-auto px-6 relative">
-            <h2 class="text-4xl font-display font-bold text-center mb-16">Browse by Genre</h2>
+    <section id="genres" class="py-20 px-4 sm:px-6 lg:px-8 bg-card-bg/30">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-4xl sm:text-5xl font-bold font-space mb-12 text-center">
+                Explore <span class="gradient-text">Genres</span>
+            </h2>
             
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="genreGrid">
-                <!-- Genre cards injected here -->
+            <div class="flex flex-wrap justify-center gap-4 mb-12" id="genreContainer">
+                <button class="genre-pill active px-6 py-3 rounded-full glass-morphism text-white font-medium" data-genre="all">All</button>
+                <button class="genre-pill px-6 py-3 rounded-full glass-morphism text-gray-400 hover:text-white font-medium" data-genre="action">Action</button>
+                <button class="genre-pill px-6 py-3 rounded-full glass-morphism text-gray-400 hover:text-white font-medium" data-genre="romance">Romance</button>
+                <button class="genre-pill px-6 py-3 rounded-full glass-morphism text-gray-400 hover:text-white font-medium" data-genre="fantasy">Fantasy</button>
+                <button class="genre-pill px-6 py-3 rounded-full glass-morphism text-gray-400 hover:text-white font-medium" data-genre="drama">Drama</button>
+                <button class="genre-pill px-6 py-3 rounded-full glass-morphism text-gray-400 hover:text-white font-medium" data-genre="comedy">Comedy</button>
+                <button class="genre-pill px-6 py-3 rounded-full glass-morphism text-gray-400 hover:text-white font-medium" data-genre="thriller">Thriller</button>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="genreGrid">
+                <!-- Filtered content -->
             </div>
         </div>
     </section>
 
-    <!-- Bookmarks Section -->
-    <section id="bookmarks" class="py-24">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-12">
-                    <h2 class="text-4xl font-display font-bold mb-4">My Bookmarks</h2>
-                    <p class="text-gray-400">Your saved manhwa collection</p>
-                </div>
-                <div id="bookmarksList" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 min-h-[400px]">
-                    <div class="col-span-full flex flex-col items-center justify-center text-gray-500 py-20">
-                        <i data-lucide="bookmark-x" class="w-16 h-16 mb-4 opacity-50"></i>
-                        <p class="text-lg">No bookmarks yet</p>
-                        <p class="text-sm">Start adding your favorite manhwa to your collection</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-darker border-t border-white/10 py-16">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="grid md:grid-cols-4 gap-12 mb-12">
+    <!-- Latest Updates -->
+    <section id="latest" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-end justify-between mb-12">
                 <div>
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                            <i data-lucide="book-open" class="w-6 h-6 text-white"></i>
+                    <h2 class="text-4xl sm:text-5xl font-bold font-space mb-4">
+                        Latest <span class="text-neon-cyan">Updates</span>
+                    </h2>
+                    <p class="text-gray-400">Fresh chapters released today</p>
+                </div>
+            </div>
+            
+            <div class="space-y-4" id="latestList">
+                <!-- List items injected by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Bookmarks Section (User Specific) -->
+    <section id="bookmarks" class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-card-bg/30 to-dark-bg">
+        <div class="max-w-7xl mx-auto">
+            <div class="glass-morphism rounded-3xl p-8 md:p-12 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-neon-pink/20 rounded-full blur-3xl"></div>
+                
+                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div>
+                        <h2 class="text-3xl md:text-4xl font-bold font-space mb-4">
+                            Your <span class="text-neon-pink">Bookmarks</span>
+                        </h2>
+                        <p class="text-gray-400 max-w-md">
+                            Keep track of your reading progress. Login to sync your library across all devices.
+                        </p>
+                    </div>
+                    
+                    <div class="flex items-center gap-4">
+                        <div id="bookmarkCount" class="text-center">
+                            <div class="text-4xl font-bold text-white">0</div>
+                            <div class="text-sm text-gray-500">Saved</div>
                         </div>
-                        <span class="font-display text-2xl font-bold">MANHWA<span class="text-primary">VERSE</span></span>
-                    </div>
-                    <p class="text-gray-400 text-sm leading-relaxed">
-                        Your ultimate destination for premium manhwa content. Read anywhere, anytime.
-                    </p>
-                </div>
-                <div class="flex gap-4">
-                        <a href="#" class="w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-primary hover:text-white transition-all">
-                            <i data-lucide="twitter" class="w-5 h-5"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-primary hover:text-white transition-all">
-                            <i data-lucide="instagram" class="w-5 h-5"></i>
-                        <a href="#" class="w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-primary hover:text-white transition-all">
-                            <i data-lucide="github" class="w-5 h-5"></i>
-                        </a href="#" class="div>
-                </div>
-                <div>
-                    <h4 class="font-display font-bold mb-4">Quick Links</h4>
-                    <ul class="space-y-3 text-sm text-gray-400">
-                        <li><a href="#" class="hover:text-primary transition-colors">About Us</A></li>
-                        <li><A href="#" class="hover:text-primary transition-colors">Contact</A></li>
-                        <li><A href="#" class="hover:text-primary transition-colors">Privacy Policy</A></li>
-                        <li><A href="#" class="hover:text-primary transition-colors">Terms of Service</A></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-display font-bold mb-4">Genres</h4>
-                    <ul class="space-y-3 text-sm text-gray-400">
-                        <li><A href="#" class="hover:text-primary transition-colors">Action</A></li>
-                        <li><A href="#" class="hover:text-primary transition-colors">Romance</A></li>
-                        <li><A href="#" class="hover:text-primary transition-colors">Fantasy</A></li>
-                        <li><A href="#" class="hover:text-primary transition-colors">Thriller</A></li>
-                        <li><A href="#" class="hover:text-primary transition-colors">Slice of Life</A></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-display font-bold mb-4">Support</h4>
-                    <ul class="space-y-3 text-sm text-gray-400">
-                        <li><A href="#" class="hover:text-primary transition-colors">Help Center</A></li>
-                        <li><A href="#" class="hover:text-primary">Report Issue</A></li>
-                        <li><A href="#" class="hover:text-primary transition-colors">Feedback</A></li>
-                    </ul>
-                <div>
-                    <h4 class="font-display font-bold mb-4">Newsletter</h4>
-                    <p class="text-sm text-gray-400 mb-4">Subscribe for weekly updates on new chapters</p>
-                    <div class="flex gap-2">
-                        <input type="email" placeholder="Enter your email" class="flex-1 bg-surface border border-white/10 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors">
-                        <button class="px-6 py-3 bg-primary rounded-lg font-medium hover:bg-primary/80 transition-all">
-                            Subscribe
+                        <button id="viewBookmarksBtn" class="px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white font-medium">
+                            View Library
                         </button>
                     </div>
                 </div>
             </div>
-            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
-                <p>&copy; 2026 ManhwaVerse. All rights reserved.</p>
-                <div class="flex gap-6">
-                    <a href="#" class="hover:text-white transition-colors">Privacy</A>
-                    <a href="#" class="hover:text-white transition-colors">Terms</A>
-                    <a href="#" class="hover:text-white transition-colors">Cookies</A>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 sm:px-6 lg:px-8 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-neon-pink to-neon-purple flex items-center justify-center">
+                            <i data-lucide="book-open" class="w-4 h-4 text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold font-space">ManhwaComics</span>
+                    </div>
+                    <p class="text-gray-400 text-sm max-w-sm mb-4">
+                        The ultimate destination for manhwa enthusiasts. Read premium Korean comics in high definition, anytime, anywhere.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full glass-morphism flex items-center justify-center hover:bg-neon-pink/20 transition-colors">
+                            <i data-lucide="twitter" class="w-4 h-4"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full glass-morphism flex items-center justify-center hover:bg-neon-pink/20 transition-colors">
+                            <i data-lucide="instagram" class="w-4 h-4"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full glass-morphism flex items-center justify-center hover:bg-neon-pink/20 transition-colors">
+                            <i data-lucide="discord" class="w-4 h-4"></i>
+                        </a>
+                    </div>
                 </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">FAQ</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Careers</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Legal</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Cookie Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">DMCA</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="pt-8 border-t border-gray-800 flex flex-col md:flex-row items-center justify-between gap-4">
+                <p class="text-sm text-gray-500">© 2026 ManhwaComics. All rights reserved.</p>
+                <p class="text-sm text-gray-500">Made with <span class="text-neon-pink">♥</span> for manhwa lovers</p>
             </div>
         </div>
     </footer>
 
+    <!-- Login Modal -->
+    <div id="loginModal" class="login-modal fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="loginOverlay"></div>
+        
+        <div class="login-content relative w-full max-w-md glass-morphism rounded-3xl p-8 md:p-10 border border-white/10">
+            <button id="closeLogin" class="absolute top-4 right-4 p-2 rounded-full hover:bg-white/10 transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-neon-pink to-neon-purple flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="user" class="w-8 h-8 text-white"></i>
+                </div>
+                <h3 class="text-2xl font-bold font-space mb-2">Welcome Back</h3>
+                <p class="text-gray-400 text-sm">Sign in to access your bookmarks</p>
+            </div>
+            
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-2">Email</label>
+                    <input type="email" placeholder="you@example.com" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-neon-pink focus:outline-none transition-colors text-white placeholder-gray-600">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-2">Password</label>
+                    <input type="password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-neon-pink focus:outline-none transition-colors text-white placeholder-gray-600">
+                </div>
+                
+                <div class="flex items-center justify-between text-sm">
+                    <label class="flex items-center gap-2 text-gray-400 cursor-pointer">
+                        <input type="checkbox" class="rounded bg-white/5 border-white/10 text-neon-pink focus:ring-neon-pink">
+                        Remember me
+                    </label>
+                    <a href="#" class="text-neon-pink hover:text-white transition-colors">Forgot password?</a>
+                </div>
+                
+                <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-neon-pink to-neon-purple text-white font-bold hover:shadow-lg hover:shadow-neon-pink/30 transition-all transform hover:scale-[1.02]">
+                    Sign In
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-400">Don't have an account? <a href="#" class="text-neon-pink hover:text-white transition-colors font-medium">Sign up</a></p>
+            </div>
+            
+            <div class="mt-6 pt-6 border-t border-white/10">
+                <p class="text-center text-sm text-gray-500 mb-4">Or continue with</p>
+                <div class="flex gap-3">
+                    <button class="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
+                        <i data-lucide="chrome" class="w-5 h-5"></i>
+                        <span class="text-sm">Google</span>
+                    </button>
+                    <button class="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
+                        <i data-lucide="apple" class="w-5 h-5"></i>
+                        <span class="text-sm">Apple</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-8 right-8 transform translate-y-32 opacity-0 transition-all duration-500 z-50">
-        <div class="glass px-6 py-4 rounded-xl flex items-center gap-3 shadow-2xl">
-            <i data-lucide="check-circle" class="w-5 h-5 text-green-400"></i>
-            <span id="toastMessage" class="font-medium">Added to bookmarks</span>
+    <div id="toast" class="fixed bottom-8 right-8 z-[100] transform translate-y-20 opacity-0 transition-all duration-300">
+        <div class="glass-morphism rounded-xl px-6 py-4 flex items-center gap-3 border border-neon-pink/30">
+            <i data-lucide="check-circle" class="w-5 h-5 text-neon-pink"></i>
+            <span id="toastMessage" class="text-sm font-medium">Added to bookmarks</span>
         </div>
     </div>
 
     <script>
         // Initialize Lucide Icons
         lucide.createIcons();
-
+        
         // Initialize Lenis Smooth Scroll
         const lenis = new Lenis({
             duration: 1.2,
-            easing: (t) => Math.min(1, 1 - Math.pow(1 - t, 3)),
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             direction: 'vertical',
             gestureDirection: 'vertical',
             smooth: true,
+            mouseMultiplier: 1,
             smoothTouch: false,
             touchMultiplier: 2,
-        infinite: false,
-        wheelMultiplier: 1,
-            useRaf: true
+            infinite: false,
         });
-
-        // Connect Lenis to GSAP ScrollTrigger
+        
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+        
+        // GSAP ScrollTrigger integration with Lenis
         lenis.on('scroll', ScrollTrigger.update);
-
         gsap.ticker.add((time) => {
             lenis.raf(time * 1000);
         });
-
         gsap.ticker.lagSmoothing(0);
-
-        // Register ScrollTrigger
-        gsap.registerPlugin(ScrollTrigger);
-
-        // Manhwa Data
-        const manhwaData = {
-            popular: [
-                {
-                    id: 1,
-                    title: "Solo Leveling",
-                    chapter: "Chapter 179",
-                    genre: "Action",
-                    rating: 4.9,
-                    image: "https://images.unsplash.com/photo-1618336753974-aae8e04506aa?w=400&h=600&fit=crop",
-                    description: "Follow the journey of Sung Jin-Woo as he rises from the weakest hunter to the strongest."
-                },
-                {
-                    id: 2,
-                    title: "Omniscient Reader",
-                    chapter: "Chapter 156",
-                    genre: "Thriller",
-                    rating: 4.8,
-                    image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&h=600&fit=crop",
-                    description: "The only reader who knows how the story ends tries to change the inevitable conclusion."
-                },
-                {
-                    id: 3,
-                    title: "Tower of God",
-                    chapter: "Chapter 550",
-                    genre: "Fantasy",
-                    rating: 4.7,
-                    image: "https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=400&h=600&fit=crop",
-                    description: "A boy enters a mysterious tower to find his friend and discovers his destiny."
-                },
-                {
-                    id: 4,
-                    title: "True Beauty",
-                    chapter: "Chapter 223",
-                    genre: "Romance",
-                    rating: 4.6,
-                    image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=600&fit=crop",
-                    description: "A girl masters the art of makeup and navigates high school life."
-                },
-                {
-                    id: 5,
-                    title: "Lore Olympus",
-                    chapter: "Chapter 245",
-                    genre: "Romance",
-                    rating: 4.8,
-                    image: "https://images.unsplash.com/photo-1618005182384-83a82ef0b6f8?w=400&h=600&fit=crop",
-                    description: "A modern retelling of the Persephone and Hades love story with stunning art."
-                },
-                {
-                    id: 6,
-                    title: "Lore Olympus",
-                    chapter: "Chapter 245",
-                    genre: "Romance",
-                    rating: 4.8,
-                    image: "https://images.unsplash.com/photo-1618005182384-83a82ef0b6f8?w=400&h=600&fit=crop",
-                    description: "A modern retelling of the Persephone and Hades love story with stunning art."
-                },
-                {
-                    id: 7,
-                    title: "Bastard",
-                    chapter: "Chapter 93",
-                    genre: "Thriller",
-                    rating: 4.7,
-                    image: "https://images.unsplash.com/photo-1509347528160-9a9e33742cd4?w=400&h=600&fit=crop",
-                    description: "A psychological thriller about a boy with a mysterious past and his new family."
-                },
-                {
-                    id: 8,
-                    title: "Sweet Home",
-                    chapter: "Chapter 140",
-                    genre: "Horror",
-                    rating: 4.6,
-                    image: "https://images.unsplash.com/photo-1505664194779-8beaceb93744?w=400&h=600&fit=crop",
-                    description: "Monsters emerge and humanity must survive in an apartment complex."
-                }
-            ],
-            latest: [
-                {
-                    id: 9,
-                    title: "Noblesse",
-                    chapter: "Chapter 544",
-                    time: "2 hours ago",
-                    genre: "Fantasy",
-                    image: "https://images.unsplash.com/photo-1534447677768-be436bb15401c?w=400&h=600&fit=crop"
-                },
-                {
-                    id: 10,
-                    title: "The Beginning After The End",
-                    chapter: "Chapter 182",
-                    time: "4 hours ago",
-                    genre: "Fantasy",
-                    image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&h=600&fit=crop"
-                },
-                {
-                    id: 11,
-                    title: "Lookism",
-                    chapter: "Chapter 489",
-                    time: "6 hours ago",
-                    genre: "Drama",
-                    image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e4b?w=400&h=600&fit=crop"
-                },
-                {
-                    id: 12,
-                    title: "Weak Hero",
-                    chapter: "Chapter 267",
-                    time: "8 hours ago",
-                    genre: "Action",
-                    image: "https://images.unsplash.com/photo-1514539079130-1f5f74c2d08b?w=400&h=600&fit=crop"
-                },
-                {
-                    id: 13,
-                    title: "Eleceed",
-                    chapter: "Chapter 312",
-                    time: "12 hours ago",
-                    genre: "Action",
-                    image: "https://images.unsplash.com/photo-1614726365723-49cfae9278b7?w=400&h=600&fit=crop"
-                },
-                {
-                    id: 14,
-                    title: "Study Group",
-                    chapter: "Chapter 198",
-                    time: "1 day ago",
-                    genre: "Drama",
-                    image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=600&fit=crop"
-                }
-            ],
-            genres: [
-                { name: "Action", icon: "sword", color: "text-red-400" },
-                { name: "Romance", icon: "heart", color: "text-pink-400" },
-                { name: "Fantasy", icon: "sparkles", color: "text-purple-400" },
-                { name: "Thriller", icon: "alert-triangle", color: "text-yellow-400" },
-                { name: "Horror", icon: "ghost", color: "text-gray-400" },
-                { name: "Comedy", icon: "smile", color: "text-orange-400" },
-                { name: "Drama", icon: "drama-masks", color: "text-blue-400" },
-                { name: "Slice of Life", icon: "coffee", color: "text-green-400" },
-                { name: "Sports", icon: "trophy", color: "text-yellow-600" },
-                { name: "Sci-Fi", icon: "rocket", color: "text-cyan-400" }
-            ]
-        };
-
-        // State Management
-        let bookmarks = JSON.parse(localStorage.getItem('manhwaBookmarks')) || [];
-        let currentFilter = 'all';
-
-        // Loader Animation
-        window.addEventListener('load', () => {
-            const loader = document.getElementById('loader');
-            const loaderBar = document.getElementById('loaderBar');
-            const loaderText = document.querySelector('.loader-text');
+        
+        // Three.js Hero Background
+        const initThreeJS = () => {
+            const canvas = document.getElementById('heroCanvas');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
             
-            gsap.to(loaderBar, {
-                width: '100%',
-                duration: 1.5,
-                ease: 'power2.inOut',
-                onComplete: () => {
-                    gsap.to(loaderText, {
-                        opacity: 0,
-                        y: -20,
-                        duration: 0.5
-                    });
-                    gsap.to(loader, {
-                        opacity: 0,
-                        duration: 0.5,
-                        delay: 0.2,
-                        onComplete: () => {
-                            loader.style.display = 'none';
-                            initAnimations();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            
+            // Create particles
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 1500;
+            const posArray = new Float32Array(particlesCount * 3);
+            
+            for(let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 5;
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.005,
+                color: 0xFF006E,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+            
+            camera.position.z = 2;
+            
+            // Mouse interaction
+            let mouseX = 0;
+            let mouseY = 0;
+            
+            document.addEventListener('mousemove', (event) => {
+                mouseX = event.clientX / window.innerWidth - 0.5;
+                mouseY = event.clientY / window.innerHeight - 0.5;
+            });
+            
+            // Animation
+            const animate = () => {
+                requestAnimationFrame(animate);
+                
+                particlesMesh.rotation.y += 0.001;
+                particlesMesh.rotation.x += 0.001;
+                
+                // Mouse parallax
+                particlesMesh.rotation.x += mouseY * 0.05;
+                particlesMesh.rotation.y += mouseX * 0.05;
+                
+                renderer.render(scene, camera);
+            };
+            
+            animate();
+            
+            // Resize handler
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+        
+        initThreeJS();
+        
+        // Carousel Data - 6 Featured Manhwa
+        const carouselData = [
+            { 
+                id: 1, 
+                title: "Solo Leveling", 
+                chapter: "179", 
+                genre: "Action", 
+                image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&q=80",
+                status: "HOT",
+                color: "#FF006E"
+            },
+            { 
+                id: 2, 
+                title: "True Beauty", 
+                chapter: "204", 
+                genre: "Romance", 
+                image: "https://images.unsplash.com/photo-1618336753974-aae8e04506aa?w=600&q=80",
+                status: "NEW",
+                color: "#8338EC"
+            },
+            { 
+                id: 3, 
+                title: "Tower of God", 
+                chapter: "550", 
+                genre: "Fantasy", 
+                image: "https://images.unsplash.com/photo-1541562232579-512a21360020?w=600&q=80",
+                status: "TOP",
+                color: "#3A86FF"
+            },
+            { 
+                id: 4, 
+                title: "Lore Olympus", 
+                chapter: "230", 
+                genre: "Romance", 
+                image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=600&q=80",
+                status: "HOT",
+                color: "#FF006E"
+            },
+            { 
+                id: 5, 
+                title: "Omniscient Reader", 
+                chapter: "150", 
+                genre: "Thriller", 
+                image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&q=80",
+                status: "NEW",
+                color: "#00F5FF"
+            },
+            { 
+                id: 6, 
+                title: "Sweet Home", 
+                chapter: "140", 
+                genre: "Horror", 
+                image: "https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=600&q=80",
+                status: "DONE",
+                color: "#FFD700"
+            }
+        ];
+        
+        // 3D Carousel Class
+        class Carousel3D {
+            constructor(container, data) {
+                this.container = container;
+                this.data = data;
+                this.cards = [];
+                this.currentIndex = 0;
+                this.isAnimating = false;
+                this.autoplayInterval = null;
+                
+                this.init();
+            }
+            
+            init() {
+                this.createCards();
+                this.createDots();
+                this.setupEventListeners();
+                this.updatePositions();
+                this.startAutoplay();
+            }
+            
+            createCards() {
+                const carousel3d = this.container.querySelector('#carousel3d');
+                
+                this.data.forEach((item, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'carousel-card';
+                    card.innerHTML = `
+                        <img src="${item.image}" alt="${item.title}">
+                        <div class="reflection"></div>
+                        <div class="card-info">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-1 rounded text-xs font-bold" style="background: ${item.color}; color: white;">${item.status}</span>
+                                <span class="text-xs text-gray-300">${item.genre}</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-1">${item.title}</h3>
+                            <p class="text-sm text-gray-400">Chapter ${item.chapter}</p>
+                            <div class="mt-3 flex gap-2">
+                                <button class="flex-1 py-2 rounded-lg bg-white text-black text-sm font-bold hover:bg-gray-200 transition-colors">
+                                    Read Now
+                                </button>
+                                <button class="p-2 rounded-lg glass-morphism hover:bg-white/20 transition-colors bookmark-btn" data-id="${item.id}">
+                                    <i data-lucide="bookmark" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add click to rotate to this card
+                    card.addEventListener('click', () => {
+                        if (index !== this.currentIndex) {
+                            this.goToSlide(index);
                         }
                     });
-                }
-            });
-        });
-
-        // Initialize Animations
-        function InitAnimations() {
-            // Hero Animations
-            gsap.from('.hero-content > *', {
-                y: 60,
-                opacity: 0,
-                duration: 1,
-                stagger: 0.1,
-                ease: 'power3.out'
-            });
-
-            // Header scroll effect
-            ScrollTrigger.create({
-                trigger: 'body',
-                start: 'top -80',
-                end: 99999,
-                onUpdate: (self) => {
-                    const header = document.getElementById('mainHeader');
-                    if (self.direction === -1) {
-                        header.classList.add('bg-surface/95', 'backdrop-blur-md');
-                    }  else {
-                        header.classList.remove('bg-surface/95', 'backdrop-blur-md');
+                    
+                    carousel3d.appendChild(card);
+                    this.cards.push(card);
+                });
+                
+                lucide.createIcons();
+            }
+            
+            createDots() {
+                const nav = this.container.querySelector('#carouselNav');
+                this.data.forEach((_, index) => {
+                    const dot = document.createElement('div');
+                    dot.className = `carousel-dot ${index === 0 ? 'active' : ''}`;
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    nav.appendChild(dot);
+                });
+            }
+            
+            updatePositions() {
+                const total = this.cards.length;
+                const angleStep = 360 / total;
+                const radius = window.innerWidth < 768 ? 200 : 320;
+                
+                this.cards.forEach((card, index) => {
+                    const offset = index - this.currentIndex;
+                    const angle = offset * angleStep;
+                    const radian = (angle * Math.PI) / 180;
+                    
+                    // Calculate 3D position
+                    const x = Math.sin(radian) * radius;
+                    const z = Math.cos(radian) * radius - radius;
+                    const rotateY = -angle;
+                    
+                    // Scale and opacity based on position
+                    const distance = Math.abs(offset);
+                    const scale = distance === 0 ? 1.1 : Math.max(0.6, 1 - distance * 0.15);
+                    const opacity = distance === 0 ? 1 : Math.max(0.3, 1 - distance * 0.2);
+                    const blur = distance === 0 ? 0 : distance * 2;
+                    
+                    // Apply transforms
+                    card.style.transform = `
+                        translateX(${x}px) 
+                        translateZ(${z}px) 
+                        rotateY(${rotateY}deg) 
+                        scale(${scale})
+                    `;
+                    card.style.opacity = opacity;
+                    card.style.filter = `blur(${blur}px)`;
+                    card.style.zIndex = total - distance;
+                    
+                    // Add active class to front card
+                    if (distance === 0) {
+                        card.classList.add('active');
+                    } else {
+                        card.classList.remove('active');
                     }
+                });
+                
+                // Update dots
+                const dots = this.container.querySelectorAll('.carousel-dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === this.currentIndex);
+                });
+            }
+            
+            goToSlide(index) {
+                if (this.isAnimating || index === this.currentIndex) return;
+                this.isAnimating = true;
+                
+                // Handle infinite loop
+                if (index < 0) index = this.cards.length - 1;
+                if (index >= this.cards.length) index = 0;
+                
+                this.currentIndex = index;
+                this.updatePositions();
+                
+                // Reset animation lock
+                setTimeout(() => {
+                    this.isAnimating = false;
+                }, 800);
+                
+                // Reset autoplay
+                this.stopAutoplay();
+                this.startAutoplay();
+            }
+            
+            next() {
+                this.goToSlide(this.currentIndex + 1);
+            }
+            
+            prev() {
+                this.goToSlide(this.currentIndex - 1);
+            }
+            
+            setupEventListeners() {
+                // Arrow buttons
+                this.container.querySelector('#prevBtn').addEventListener('click', () => this.prev());
+                this.container.querySelector('#nextBtn').addEventListener('click', () => this.next());
+                
+                // Keyboard navigation
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') this.prev();
+                    if (e.key === 'ArrowRight') this.next();
+                });
+                
+                // Touch/Swipe support
+                let touchStartX = 0;
+                let touchEndX = 0;
+                
+                this.container.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                }, { passive: true });
+                
+                this.container.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    this.handleSwipe(touchStartX, touchEndX);
+                }, { passive: true });
+                
+                // Pause on hover
+                this.container.addEventListener('mouseenter', () => this.stopAutoplay());
+                this.container.addEventListener('mouseleave', () => this.startAutoplay());
+            }
+            
+            handleSwipe(start, end) {
+                const threshold = 50;
+                const diff = start - end;
+                
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) this.next();
+                    else this.prev();
                 }
-            });
-
-            // Reading Progress
-            gsap.to('#readingProgress', {
-                width: '100%',
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: 'body',
-                    start: 'top top',
-                    end: 'bottom bottom',
-                    scrub: 0.3
+            }
+            
+            startAutoplay() {
+                this.autoplayInterval = setInterval(() => this.next(), 4000);
+            }
+            
+            stopAutoplay() {
+                if (this.autoplayInterval) {
+                    clearInterval(this.autoplayInterval);
+                    this.autoplayInterval = null;
                 }
-            });
-
-            // Populate Content
-            populatePopular();
-            populateLatest();
-            populateGenres();
-            updateBookmarkUI();
+            }
         }
-
-        // Populate Popular Grid
-        function populatePopular() {
-            const grid = document.getElementById('popularGrid');
-            grid.innerHTML = manhwaData.popular.map(manhwa => `
-                <div class="manhwa-card group relative bg-surface rounded-xl overflow-hidden cursor-pointer" data-id="${manhwa.id}">
-                    <div class="aspect-[2/3] overflow-hidden">
-                        <img src="${manhwa.image}" alt="${manhwa.title}" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        
+        // Initialize Carousel
+        const carouselContainer = document.getElementById('carouselContainer');
+        const carousel = new Carousel3D(carouselContainer, carouselData);
+        
+        // Manhwa Data for other sections
+        const manhwaData = [
+            { id: 7, title: "Let's Play", genre: "comedy", rating: 9.4, chapters: 180, image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&q=80", status: "Ongoing", tags: ["Comedy", "Romance"] },
+            { id: 8, title: "Age Matters", genre: "romance", rating: 9.2, chapters: 145, image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80", status: "Completed", tags: ["Romance", "Comedy"] },
+            { id: 9, title: "The Boxer", genre: "drama", rating: 9.7, chapters: 120, image: "https://images.unsplash.com/photo-1552072092-7f9b8d63efcb?w=400&q=80", status: "Completed", tags: ["Drama", "Sports"] },
+            { id: 10, title: "Purple Hyacinth", genre: "thriller", rating: 9.5, chapters: 160, image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400&q=80", status: "Ongoing", tags: ["Thriller", "Mystery"] },
+            { id: 11, title: "SubZero", genre: "romance", rating: 9.3, chapters: 175, image: "https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?w=400&q=80", status: "Ongoing", tags: ["Romance", "Fantasy"] },
+            { id: 12, title: "Lumine", genre: "fantasy", rating: 9.1, chapters: 130, image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&q=80", status: "Completed", tags: ["Fantasy", "Action"] }
+        ];
+        
+        // Combine all data
+        const allManhwa = [...carouselData.map(c => ({...c, rating: 9.8, tags: [c.genre]})), ...manhwaData];
+        
+        // Bookmarks State
+        let bookmarks = JSON.parse(localStorage.getItem('manhwaBookmarks')) || [];
+        let currentUser = null;
+        
+        // Render Functions
+        const createManhwaCard = (manhwa, index) => {
+            const isBookmarked = bookmarks.includes(manhwa.id);
+            return `
+                <div class="manga-card group relative rounded-2xl overflow-hidden gradient-border bg-card-bg cursor-pointer" data-id="${manhwa.id}" data-aos="fade-up" data-aos-delay="${index * 100}">
+                    <div class="aspect-[3/4] overflow-hidden relative">
+                        <img src="${manhwa.image}" alt="${manhwa.title}" class="card-image w-full h-full object-cover">
+                        <div class="card-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex flex-col justify-end p-4">
+                            <div class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                <button class="w-full py-2 rounded-lg bg-white text-black font-bold text-sm mb-2 hover:bg-gray-200 transition-colors">
+                                    Read Now
+                                </button>
+                                <button class="w-full py-2 rounded-lg glass-morphism text-white font-bold text-sm flex items-center justify-center gap-2 bookmark-toggle ${isBookmarked ? 'text-neon-pink' : ''}" data-id="${manhwa.id}">
+                                    <i data-lucide="${isBookmarked ? 'bookmark-check' : 'bookmark'}" class="w-4 h-4"></i>
+                                    ${isBookmarked ? 'Bookmarked' : 'Bookmark'}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="absolute top-2 right-2 px-2 py-1 rounded-md bg-black/60 backdrop-blur-sm text-xs font-bold text-white flex items-center gap-1">
+                            <i data-lucide="star" class="w-3 h-3 text-yellow-400 fill-yellow-400"></i>
+                            ${manhwa.rating || '9.5'}
+                        </div>
                     </div>
-                    <div class="absolute bottom-0 left-0 right-0 p-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="px-3 py-1 bg-primary/80 rounded-full text-xs font-bold">${manhwa.genre}</span>
-                            <span class="text-xs text-gray-300">${manhwa.chapter}</span>
+                    <div class="p-4">
+                        <h3 class="font-bold text-white mb-1 truncate group-hover:text-neon-pink transition-colors">${manhwa.title}</h3>
+                        <div class="flex items-center justify-between text-xs text-gray-400">
+                            <span class="capitalize">${manhwa.genre}</span>
+                            <span>${manhwa.chapters} Ch</span>
                         </div>
-                        <h3 class="font-display font-bold text-lg mb-1 line-clamp-1">${manhwa.title}</h3>
-                        <div class="flex items-center gap-1 mb-2">
-                            <i data-lucide="star" class="w-4 h-4 fill-yellow-400 text-yellow-400"></i>
-                            <span class="text-sm font-bold text-yellow-400">${manhwa.rating}</span>
+                        <div class="mt-2 flex flex-wrap gap-1">
+                            ${(manhwa.tags || [manhwa.genre]).map(tag => `<span class="px-2 py-0.5 rounded-full bg-white/5 text-[10px] text-gray-300">${tag}</span>`).join('')}
                         </div>
-                        <p class="text-sm text-gray-400 line-clamp-2">${manhwa.description}</p>
-                        <button class="bookmark-btn absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all ${bookmarks.includes(manhwa.id) ? 'text-secondary' : 'text-white'}" onclick="toggleBookmark(${manhwa.id})">
-                            <i data-lucide="${bookmarks.includes(manhwa.id) ? 'bookmark' : 'bookmark'}" class="w-5 h-5 ${bookmarks.includes(manhwa.id) ? 'fill-current' : ''}"></i>
-                        </button>
                     </div>
                 </div>
-            `).join('');
-            
-            // Re-initialize icons for new content
+            `;
+        };
+        
+        const createLatestItem = (manhwa, index) => {
+            const progress = Math.floor(Math.random() * 100);
+            return `
+                <div class="group flex items-center gap-4 p-4 rounded-2xl glass-morphism hover:bg-white/5 transition-all cursor-pointer transform hover:translate-x-2" data-aos="fade-left" data-aos-delay="${index * 50}">
+                    <div class="relative w-20 h-28 rounded-xl overflow-hidden flex-shrink-0">
+                        <img src="${manhwa.image}" alt="${manhwa.title}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i data-lucide="play" class="w-8 h-8 text-white"></i>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h4 class="font-bold text-white truncate group-hover:text-neon-pink transition-colors">${manhwa.title}</h4>
+                            <span class="px-2 py-0.5 rounded-full bg-neon-pink/20 text-neon-pink text-xs font-bold">NEW</span>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-2">Chapter ${manhwa.chapters} • 2 hours ago</p>
+                        <div class="flex items-center gap-3">
+                            <div class="flex-1 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full reading-progress rounded-full" style="width: ${progress}%"></div>
+                            </div>
+                            <span class="text-xs text-gray-500">${progress}%</span>
+                        </div>
+                    </div>
+                    <button class="bookmark-toggle p-2 rounded-full hover:bg-white/10 transition-colors ${bookmarks.includes(manhwa.id) ? 'text-neon-pink' : 'text-gray-400'}" data-id="${manhwa.id}">
+                        <i data-lucide="${bookmarks.includes(manhwa.id) ? 'bookmark-check' : 'bookmark'}" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            `;
+        };
+        
+        // Render Content
+        const renderTrending = () => {
+            const trending = allManhwa.slice(0, 5);
+            document.getElementById('trendingGrid').innerHTML = trending.map((m, i) => createManhwaCard(m, i)).join('');
             lucide.createIcons();
-            
-            // Add click handlers
-            document.querySelectorAll('.manhwa-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    gsap.to(card, {
-                        scale: 0.95,
-                        duration: 0.1,
-                        yoyo: true,
-                        repeat: 1,
-                        onComplete: () => {
-                            gsap.to(card, { scale: 1, duration: 0.3 });
-                        }
-                    });
+        };
+        
+        const renderGenre = (genre = 'all') => {
+            const filtered = genre === 'all' ? allManhwa : allManhwa.filter(m => m.genre === genre);
+            document.getElementById('genreGrid').innerHTML = filtered.map((m, i) => createManhwaCard(m, i)).join('');
+            lucide.createIcons();
+        };
+        
+        const renderLatest = () => {
+            const latest = [...allManhwa].sort(() => Math.random() - 0.5).slice(0, 6);
+            document.getElementById('latestList').innerHTML = latest.map((m, i) => createLatestItem(m, i)).join('');
+            lucide.createIcons();
+        };
+        
+        // Initialize
+        renderTrending();
+        renderGenre();
+        renderLatest();
+        updateBookmarkCount();
+        
+        // Genre Filter
+        document.querySelectorAll('.genre-pill').forEach(pill => {
+            pill.addEventListener('click', (e) => {
+                document.querySelectorAll('.genre-pill').forEach(p => p.classList.remove('active'));
+                e.target.classList.add('active');
+                renderGenre(e.target.dataset.genre);
+                attachBookmarkListeners();
+            });
+        });
+        
+        // Bookmark Functionality
+        function attachBookmarkListeners() {
+            document.querySelectorAll('.bookmark-toggle').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = parseInt(btn.dataset.id);
+                    toggleBookmark(id, btn);
                 });
             });
         }
-
-        // Populate Latest Grid
-        function populateLatest() {
-            const grid = document.getElementById('latestGrid');
-            grid.innerHTML = manhwaData.latest.map(manhwa => `
-                <div class="manhwa-card group relative bg-surface rounded-xl overflow-hidden cursor-pointer" data-id="${manhwa.id}">
-                    <div class="aspect-[2/3] overflow-hidden">
-                        <img src="${manhwa.image}" alt="${manhwa.title}" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
-                    <div class="absolute top-4 left-4">
-                        <span class="px-3 py-1 bg-primary rounded-full text-xs font-bold">${manhwa.time}</span>
-                    </div>
-                    <div class="absolute bottom-0 left-0 right-0 p-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="px-3 py-1 bg-secondary/20 rounded-full text-xs font-bold">${manhwa.genre}</span>
-                            <span class="text-xs text-gray-400">${manhwa.chapter}</span>
-                        </h3>
-                        <h3 class="font-display font-bold text-lg mb-1">${manhwa.title}</h3>
-                        <button class="bookmark-btn w-8 h-8 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all ${bookmarks.includes(manhwa.id) ? 'text-secondary' : 'text-white'}" onclick="toggleBookmark(${manhwa.id})">
-                            <i data-lucide="${bookmarks.includes(manhwa.id) ? 'bookmark' : 'bookmark'}" class="w-4 h-4 ${bookmarks.includes(manhwa.id) ? 'fill-current' : ''}"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            `).join('');
-            
-            lucide.createIcons();
-        }
-
-        // Populate Genres
-        function populateGenres() {
-            const grid = document.getElementById('genreGrid');
-            grid.innerHTML = manhwaData.genres.map(genre => `
-                <div class="genre-card group relative p-6 rounded-xl glass cursor-pointer hover:bg-white/10 transition-all" onclick="filterByGenre('${genre.name}')">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-full bg-surface flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                            <i data-lucide="${genre.icon}" class="w-6 h-6 ${genre.color}"></i>
-                    </div>
-                    <span class="font-display font-bold">${genre.name}</span>
-                    <div class="absolute inset-0 rounded-xl border border-white/0 group-hover:border-white/20 transition-all duration-300"></div>
-                </div>
-            `).join('');
-            
-            lucide.createIcons();
-        }
-
-        // Toggle Bookmark
-        function toggleBookmark(id) {
+        
+        function toggleBookmark(id, btn) {
             const index = bookmarks.indexOf(id);
+            const manhwa = allManhwa.find(m => m.id === id);
+            
             if (index > -1) {
                 bookmarks.splice(index, 1);
-                showToast('Removed from bookmarks');
+                showToast(`Removed ${manhwa.title} from bookmarks`);
+                btn.classList.remove('text-neon-pink');
+                if (btn.innerHTML.includes('Bookmarked')) {
+                    btn.innerHTML = `<i data-lucide="bookmark" class="w-4 h-4"></i> Bookmark`;
+                } else {
+                    btn.innerHTML = `<i data-lucide="bookmark" class="w-5 h-5"></i>`;
+                }
             } else {
                 bookmarks.push(id);
-                showToast('Added to bookmarks');
-            }
-            
-            // Animate the button
-            const btn = event.target.closest('.bookmark-btn');
-            gsap.to(btn, {
-                scale: 1.3,
-                duration: 0.2,
-                yoyo: true,
-                repeat: 1
-            });
-        }
-        
-        localStorage.setItem('manhwaBookmarks', JSON.stringify(bookmarks));
-        updateBookmarkUI();
-        
-
-        // Update Bookmark UI
-        function updateBookmarkUI() {
-            const count = document.getElementById('bookmarkCount');
-            const list = document.getElementById('bookmarksList');
-            
-            count.textContent = bookmarks.length;
-            count.classList.toggle('hidden', bookmarks.length === 0);
-            
-            if (bookmarks.length === 0) {
-                list.innerHTML = `
-                    <div class="col-span-full flex flex-col items-center justify-center text-gray-500 py-20">
-                        <i data-lucide="bookmark-x" class="w-16 h-16 mb-4 opacity-50"></i>
-                        <p class="text-lg">No bookmarks yet</p>
-                        <p class="text-sm">Start adding your favorite manhwa to your collection</p>
-                    </div>
-                </div>
-                    </div>
-                `;
-            } else {
-                const bookmarkedManhwa = manhwaData.popular.filter(m => bookmarks.includes(m.id));
-                list.innerHTML = bookmarkedManhwa.map(manhwa => `
-                    <div class="manhwa-card group relative bg-surface rounded-xl overflow-hidden cursor-pointer" data-id="${manhwa.id}">
-                        <div class="flex gap-4 p-4">
-                            <img src="${manhwa.image}" alt="${manhwa.title}" class="w-24 h-32 object-cover rounded-lg">
-                            <div class="flex-1">
-                                <h4 class="font-display font-bold mb-1">${manhwa.title}</h4>
-                                <p class="text-sm text-gray-400 mb-2">${manhwa.chapter}</p>
-                                <button class="text-red-400 hover:text-red-300 text-sm font-medium" onclick="toggleBookmark(${manhwa.id})">Remove</button>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-                lucide.createIcons();
-            }
-        }
-
-        // Update all bookmark buttons
-        document.querySelectorAll('.manhwa-card').forEach(card => {
-            const id = parseInt(card.dataset.id);
-            const btn = card.querySelector('.bookmark-btn');
-            if (btn) {
-                const icon = btn.querySelector('i');
-                if (bookmarks.includes(id)) {
-                    btn.classList.add('text-secondary');
-                    icon.setAttribute('data-lucide', 'bookmark');
-                } } else {
-                    btn.classList.remove('text-secondary');
-                    icon.setAttribute('data-lucide', 'bookmark');
+                showToast(`Added ${manhwa.title} to bookmarks`);
+                btn.classList.add('text-neon-pink');
+                if (btn.innerHTML.includes('Bookmark')) {
+                    btn.innerHTML = `<i data-lucide="bookmark-check" class="w-4 h-4"></i> Bookmarked`;
+                } else {
+                    btn.innerHTML = `<i data-lucide="bookmark-check" class="w-5 h-5"></i>`;
                 }
+                btn.classList.add('bookmark-btn', 'active');
+                setTimeout(() => btn.classList.remove('active'), 300);
             }
-        );
-
-        // Show Toast
+            
+            localStorage.setItem('manhwaBookmarks', JSON.stringify(bookmarks));
+            updateBookmarkCount();
+            lucide.createIcons();
+        }
+        
+        function updateBookmarkCount() {
+            document.querySelector('#bookmarkCount div').textContent = bookmarks.length;
+        }
+        
         function showToast(message) {
             const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
-            
-            toastMessage.textContent = message;
-            toast.classList.remove('translate-y-32', 'opacity-0');
-            
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
             setTimeout(() => {
-                toast.classList.add('translate-y-32', 'opacity-0');
-            }, setTimeout(() => {
-                    toast.classList.remove('translate-y-32', 'opacity-0');
-                }, 3000));
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
         }
-
-        // Filter by Genre
-        function filterByGenre(genre) {
-            const cards = document.querySelectorAll('#popularGrid .manhwa-card');
-            
-            cards.forEach(card => {
-                const cardGenre = card.querySelector('.bg-primary\\/80').textContent;
-                if (genre === 'all' || cardGenre === genre) {
-                    gsap.to(card, { opacity: 1, scale: 1, duration: 0.3 });
-                } else {
-                    gsap.to(card, { opacity: 0.3, scale: 0.9, duration: 0.3 });
-                }
-            });
-        };
+        
+        attachBookmarkListeners();
+        
+        // Login Modal
+        const loginModal = document.getElementById('loginModal');
+        const loginBtn = document.getElementById('loginBtn');
+        const closeLogin = document.getElementById('closeLogin');
+        const loginOverlay = document.getElementById('loginOverlay');
+        const loginForm = document.getElementById('loginForm');
+        
+        function openLogin() {
+            loginModal.classList.add('active');
+            lenis.stop();
+        }
+        
+        function closeLoginModal() {
+            loginModal.classList.remove('active');
+            lenis.start();
+        }
+        
+        loginBtn.addEventListener('click', openLogin);
+        closeLogin.addEventListener('click', closeLoginModal);
+        loginOverlay.addEventListener('click', closeLoginModal);
+        
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            currentUser = { email: e.target.querySelector('input[type="email"]').value };
+            closeLoginModal();
+            showToast('Welcome back! You are now logged in.');
+            loginBtn.innerHTML = `<i data-lucide="user-check" class="w-4 h-4"></i> Profile`;
+            lucide.createIcons();
+        });
         
         // Mobile Menu
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const mobileMenu = document.getElementById('mobileMenu');
-        const mobileMenuContent = document.getElementById('mobileMenuContent');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const closeMobileMenu = document.getElementById('closeMobileMenu');
-        const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
-
+        
         mobileMenuBtn.addEventListener('click', () => {
             mobileMenu.classList.remove('translate-x-full');
-            mobileMenuContent.classList.remove('translate-x-full');
+            lenis.stop();
         });
-
-        closeMobileMenu.addEventListener('click', closeMobileMenuFn);
-        mobileMenuOverlay.addEventListener('click', closeMobileMenuFn);
-
-        function closeMobileMenuFn() {
+        
+        closeMobileMenu.addEventListener('click', () => {
             mobileMenu.classList.add('translate-x-full');
-            mobileMenuContent.classList.add('translate-x-full');
-        }
-
-        // Bookmark Button in Header
-        const bookmarkBtn = document.getElementById('bookmarkBtn');
-        bookmarkBtn.addEventListener('click', () => {
-            document.getElementById('bookmarks').scrollIntoView({ behavior: 'smooth' });
+            lenis.start();
         });
-
-        // Smooth scroll for navigation links
+        
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('translate-x-full');
+                lenis.start();
+            });
+        });
+        
+        // Navbar Scroll Effect
+        const navbar = document.getElementById('navbar');
+        let lastScroll = 0;
+        
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                navbar.classList.add('glass-morphism', 'shadow-lg');
+            } else {
+                navbar.classList.remove('glass-morphism', 'shadow-lg');
+            }
+            
+            lastScroll = currentScroll;
+        }, { passive: true });
+        
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+        
+        gsap.from('#home h1', {
+            opacity: 0,
+            y: 50,
+            duration: 1,
+            delay: 0.5,
+            ease: 'power3.out'
+        });
+        
+        gsap.from('#home p', {
+            opacity: 0,
+            y: 30,
+            duration: 1,
+            delay: 0.7,
+            ease: 'power3.out'
+        });
+        
+        gsap.utils.toArray('section').forEach(section => {
+            gsap.from(section.querySelectorAll('h2'), {
+                scrollTrigger: {
+                    trigger: section,
+                    start: 'top 80%',
+                    toggleActions: 'play none none reverse'
+                },
+                opacity: 0,
+                y: 30,
+                duration: 0.8,
+                ease: 'power3.out'
+            });
+        });
+        
+        gsap.from('.manga-card', {
+            scrollTrigger: {
+                trigger: '#trending',
+                start: 'top 80%',
+            },
+            opacity: 0,
+            y: 50,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: 'power3.out'
+        });
+        
+        // Search functionality
+        const searchBtn = document.getElementById('searchBtn');
+        searchBtn.addEventListener('click', () => {
+            showToast('Search feature coming soon!');
+        });
+        
+        // View Bookmarks Button
+        document.getElementById('viewBookmarksBtn').addEventListener('click', () => {
+            if (bookmarks.length === 0) {
+                showToast('No bookmarks yet. Start reading!');
+            } else {
+                showToast(`You have ${bookmarks.length} bookmarked series`);
+            }
+        });
+        
+        // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
+            anchor.addEventListener('click', function (e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
-                    lenis.scrollTo(target, {
-                        offset: -100,
-                        duration: 1.2
-                    });
+                    lenis.scrollTo(target, { offset: -80 });
                 }
             });
         });
-
-        // Parallax Effects
-        gsap.to('.hero-gradient .absolute', {
-            yPercent: 50,
-            ease: 'none',
-            scrollTrigger: {
-                trigger: '.hero-gradient',
-                start: 'top bottom',
-                end: 'bottom top',
-                scrub: true
-            }
+        
+        // Magnetic button effect
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px) scale(1.05)`;
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0, 0) scale(1)';
+            });
         });
+        
+        // Performance: Pause Three.js when not in viewport
+        const heroObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) {
+                    document.getElementById('heroCanvas').style.display = 'none';
+                } else {
+                    document.getElementById('heroCanvas').style.display = 'block';
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        heroObserver.observe(document.getElementById('home'));
+        
+        console.log('ManhwaComics initialized with 3D Carousel');
     </script>
 </body>
 </html>
